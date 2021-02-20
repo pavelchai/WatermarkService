@@ -26,7 +26,7 @@ namespace WatermarkService.Controllers
         }
 
         /// <summary>
-        /// Adds a watermark to the image.
+        /// Adds a watermark to the images.
         /// </summary>
         /// <param name="request"> Request info. </param>
         /// <returns> Response info. </returns>
