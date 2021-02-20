@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31005.135
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WatermarkService", "WatermarkService\WatermarkService.csproj", "{87E31941-5A16-4686-BAA1-9ED8867B6C60}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{87E31941-5A16-4686-BAA1-9ED8867B6C60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87E31941-5A16-4686-BAA1-9ED8867B6C60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87E31941-5A16-4686-BAA1-9ED8867B6C60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87E31941-5A16-4686-BAA1-9ED8867B6C60}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0F1E5386-3AAD-474C-BAB1-B45CB7A84E00}
+	EndGlobalSection
+EndGlobal

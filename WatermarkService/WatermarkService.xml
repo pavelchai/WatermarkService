@@ -1,0 +1,146 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>WatermarkService</name>
+    </assembly>
+    <members>
+        <member name="M:WatermarkService.Controllers.WatermarkServiceController.Get">
+            <summary>
+            Gets a list of the avaliable font families.
+            </summary>
+            <returns> List of the avaliable font families. </returns>
+        </member>
+        <member name="M:WatermarkService.Controllers.WatermarkServiceController.Post(WatermarkService.Models.WatermarkServiceRequest)">
+            <summary>
+            Adds a watermark to the image.
+            </summary>
+            <param name="request"> Request info. </param>
+            <returns> Response info. </returns>
+        </member>
+        <member name="T:WatermarkService.Models.Color">
+            <summary>
+            Color.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Color.A">
+            <summary>
+            Alpha component of the color.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Color.R">
+            <summary>
+            Red component of the color.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Color.G">
+            <summary>
+            Green component of the color.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Color.B">
+            <summary>
+            Blue component of the color.
+            </summary>
+        </member>
+        <member name="T:WatermarkService.Models.Font">
+            <summary>
+            Font.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Font.FontFamily">
+            <summary>
+            Family of the font.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Font.IsItalic">
+            <summary>
+            Indicates whether font is italic.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Font.IsBold">
+            <summary>
+            Indicates whether font is bold.
+            </summary>
+        </member>
+        <member name="T:WatermarkService.Models.Image">
+            <summary>
+            Image.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Image.Name">
+            <summary>
+            Name of the image.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Image.DataBase64">
+            <summary>
+            Data of the image (as Base64 string, with MIME type).
+            </summary>
+        </member>
+        <member name="T:WatermarkService.Models.Watermark">
+            <summary>
+            Watermark.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.Text">
+            <summary>
+            Text of the watermark.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.Font">
+            <summary>
+            Font for the watermark.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.BackgroundColor">
+            <summary>
+            Background color of the text.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.ForegroundColor">
+            <summary>
+            Foreground color of the text.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.RepeatCountX">
+            <summary>
+            Count of repeating by X.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.RepeatCountY">
+            <summary>
+            Count of repeating by Y.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.Watermark.RotationAngle">
+            <summary>
+            Rotation angle for the text (in radians).
+            </summary>
+        </member>
+        <member name="T:WatermarkService.Models.WatermarkServiceRequest">
+            <summary>
+            Request.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.WatermarkServiceRequest.Watermark">
+            <summary>
+            Watermark.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.WatermarkServiceRequest.Images">
+            <summary>
+            Array of the data of the input images.
+            </summary>
+        </member>
+        <member name="T:WatermarkService.Models.WatermarkServiceResponse">
+            <summary>
+            Response.
+            </summary>
+        </member>
+        <member name="P:WatermarkService.Models.WatermarkServiceResponse.Images">
+            <summary>
+            Array of the data of the output images.
+            </summary>
+        </member>
+    </members>
+</doc>

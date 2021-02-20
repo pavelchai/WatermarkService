@@ -1,0 +1,293 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title> Watermark service client </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/WatermarkService/lib/twitter-bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/WatermarkService/css/styles.css">
+</head>
+<body>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="/swagger/index.html?urls.primaryName=WatermarkService"> Open Swagger UI </a>
+        </div>
+    </nav>
+
+    <main>
+        <br />
+        <div class="container w-100">
+            <div class="mb-3">
+
+                <table class="table table-striped table-bordered w-100 mx-auto text-center">
+                    <thead>
+                        <tr class="text-center">
+                            <th> Image </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div id="previewPanelId" class="mb-3" hidden>
+                                    <img class="mw-100 align-middle" id="previewId" alt="Select image">
+                                    <input id="fileId" name="file" type="file" class="custom-file-input h-0" accept="image/*" hidden>
+                                </div>
+
+                                <label class="btn btn-primary" for="fileId">Select image</label>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <table class="table table-striped table-bordered w-100">
+                    <thead>
+                        <tr class="text-center">
+                            <th> Watermark settings </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="text-center">
+                            <td>
+                                <div class="mb-2">
+                                    <label class="float-left">Font family:</label>
+                                    <select id="fontFamiliesId" class="form-control">
+                                    </select>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Watermark:</label>
+                                    <textarea id="watermarkId" class="form-control" placeholder="Add your watermark" rows="3">Watermark</textarea>
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Alpha:</label>
+                                    <input id="alphaId" type="number" class="form-control" min="0" max="255" value="200">
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Red:</label>
+                                    <input id="redId" type="number" class="form-control" min="0" max="255" value="255">
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Green:</label>
+                                    <input id="greenId" type="number" class="form-control" min="0" max="255" value="255">
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Blue:</label>
+                                    <input id="blueId" type="number" class="form-control" min="0" max="255" value="255">
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Repeat count (by X):</label>
+                                    <input id="repeatCountXId" type="number" min="1" step="1" max="2147483647" class="form-control" value="3" pattern="\d+">
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Repeat count (by Y):</label>
+                                    <input id="repeatCountYId" type="number" min="1" step="1" max="2147483647" class="form-control" value="3" pattern="\d+">
+                                </div>
+
+                                <div class="mb-2">
+                                    <label class="float-left">Rotation angle (in radians):</label>
+                                    <input id="rotationAngleId" type="number" class="form-control" value="0.52359877559">
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <input id="submitButtonId" type="button" class="btn btn-primary float-right" value="Add watermark" disabled />
+
+                <br />
+                <br />
+
+                <div id="resultPanelId" class="mt-1" hidden>
+
+                    <table class="table table-striped table-bordered w-100 mx-auto text-center mb-3">
+                        <thead>
+                            <tr class="text-center">
+                                <th> Result </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div id="errorPanelId" class="alert alert-dismissable alert-danger" hidden>
+                                    </div>
+
+                                    <div id="imagePanelId" hidden>
+                                        <img class="mw-100 align-middle mb-3" id="resultId">
+                                        <div>
+                                            <input id="saveId" class="btn btn-primary" value="Save image">
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <br />
+
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer class="footer bg-dark text-white position-absolute">
+        <p class="text-muted overflow-hidden">&copy; Pavel Chaimardanov, 2021</p>
+    </footer>
+
+    <script async>
+        let inputFile = document.getElementById('fileId');
+        let previewPanel = document.getElementById('previewPanelId');
+        let preview = document.getElementById('previewId');
+
+        let fontFamilies = document.getElementById('fontFamiliesId');
+        let watermark = document.getElementById('watermarkId');
+        let alpha = document.getElementById('alphaId');
+        let red = document.getElementById('redId');
+        let green = document.getElementById('greenId');
+        let blue = document.getElementById('blueId');
+        let repeatCountX = document.getElementById('repeatCountXId');
+        let repeatCountY = document.getElementById('repeatCountYId');
+        let rotationAngle = document.getElementById('rotationAngleId');
+        let submit = document.getElementById('submitButtonId');
+
+        let resultPanel = document.getElementById('resultPanelId');
+        let errorPanel = document.getElementById('errorPanelId');
+        let imagePanel = document.getElementById('imagePanelId');
+        let result = document.getElementById('resultId');
+        let save = document.getElementById('saveId');
+
+        function loadImage() {
+            let files = inputFile.files;
+
+            if (files.length != 1) {
+                preview.src = "";
+                submit.disabled = true;
+                previewPanel.hidden = true;
+                return;
+            }
+
+            var file = files[0];
+            var reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+                preview.alt = file.name;
+                previewPanel.hidden = false;
+                submit.disabled = false;
+            }
+
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+            }
+        }
+
+        function saveImage(data) {
+            let sfa = document.createElement('a');
+            sfa.setAttribute('href', result.src);
+            sfa.setAttribute('download', result.alt);
+            sfa.click();
+        }
+
+        async function loadFontFamilies() {
+            let response = await fetch('/api/WatermarkService', { method: 'GET' });
+            let families = await response.json();
+            let selectElement = document.getElementById('fontFamiliesId');
+            selectElement.innerHTML = families.reduce((html, item) => html + `<option>${item}</option>`, '');
+        }
+
+        async function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function addWatermark() {
+            let files = inputFile.files;
+
+            if (files.length != 1) {
+                return;
+            }
+
+            let file = files[0];
+
+            let request = {
+                watermark: {
+                    text: watermark.value,
+                    font: {
+                        fontFamily: fontFamilies.options[fontFamilies.selectedIndex].text,
+                        isItalic: false,
+                        isBold: false
+                    },
+                    backgroundColor: {
+                        a: 0,
+                        r: 0,
+                        g: 0,
+                        b: 0
+                    },
+                    foregroundColor: {
+                        a: alpha.value,
+                        r: red.value,
+                        g: green.value,
+                        b: blue.value
+                    },
+                    repeatCountX: repeatCountX.value,
+                    repeatCountY: repeatCountY.value,
+                    rotationAngle: rotationAngle.value
+                },
+                images: [
+                    {
+                        name: file.name,
+                        dataBase64: await convertToBase64(file)
+                    }
+                ]
+            }
+
+            let response = await fetch('/api/WatermarkService', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify(request)
+            });
+
+            resultPanel.hidden = false;
+            let responseData = await response.json();
+
+            if (response.ok) {
+                errorPanel.hidden = true;
+                imagePanel.hidden = false;
+
+                let images = responseData.images;
+
+                if (images.length == 1) {
+                    result.src = images[0].dataBase64;
+                    result.alt = images[0].name;
+                }
+            }
+            else
+            {
+                errorPanel.hidden = false;
+                imagePanel.hidden = true;
+                errorPanel.innerHTML = Object.values(responseData).reduce((html, item) => html + `<div>${item}</div>`, 'Errors:');
+            }
+        }
+
+        inputFile.addEventListener("change", () => loadImage());
+        submit.addEventListener("click", () => addWatermark());
+        save.addEventListener("click", () => saveImage());
+
+        loadFontFamilies();
+    </script>
+</body>
+</html>
