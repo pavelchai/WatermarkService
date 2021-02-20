@@ -7,8 +7,6 @@ Target: .Net 5
 # How to use
 
 Online demo: https://altphotonic.ru/WatermarkService/
- 
-REST-API: https://altphotonic.ru/api/WatermarkService
 
 Swagger UI: https://altphotonic.ru/swagger/index.html?urls.primaryName=WatermarkService
 
