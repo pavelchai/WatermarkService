@@ -1,6 +1,6 @@
 # WatermarkService
 
-Represents a REST-API + Web client for the adding the watermarks to the images 
+Represents a REST service + Web client for the adding the watermarks to the images 
 
 Target: .Net 5
 
