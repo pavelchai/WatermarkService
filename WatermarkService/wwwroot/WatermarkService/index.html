@@ -261,7 +261,6 @@
                 body: JSON.stringify(request)
             });
 
-            resultPanel.hidden = false;
             let responseData = await response.json();
 
             if (response.ok) {
@@ -281,6 +280,8 @@
                 imagePanel.hidden = true;
                 errorPanel.innerHTML = Object.values(responseData).reduce((html, item) => html + `<div>${item}</div>`, 'Errors:');
             }
+
+            resultPanel.hidden = false;
         }
 
         inputFile.addEventListener("change", () => loadImage());
