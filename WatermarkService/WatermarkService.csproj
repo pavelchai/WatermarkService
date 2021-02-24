@@ -6,10 +6,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\Pavel\source\repos\WatermarkService\WatermarkService\WatermarkService.xml</DocumentationFile>
+    <NoWarn>1591;1701;1702</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>C:\Users\Pavel\source\repos\WatermarkService\WatermarkService\WatermarkService.xml</DocumentationFile>
+    <NoWarn>1591;1701;1702</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
