@@ -14,22 +14,26 @@ namespace WatermarkService.Models
     {
         private readonly static string[] lineSeparators = { "\n", "\r", "\r\n" };
 
+        private readonly static IReadOnlyList<string> fontFamilies = SKFontManager.Default.FontFamilies.ToArray();
+
         internal static IEnumerable<string> GetFontFamilies()
         {
-            return SKFontManager.Default.FontFamilies;
+            return fontFamilies;
         }
 
         internal static SKPaint CreatePaint()
         {
-            SKPaint paint = new SKPaint();
+            var paint = new SKPaint();
+
             paint.FilterQuality = SKFilterQuality.High;
             paint.IsAntialias = true;
+
             return paint;
         }
 
         internal static SKPaint CreatePaint(SKFont font)
         {
-            SKPaint paint = CreatePaint();
+            var paint = CreatePaint();
 
             paint.Typeface = font.Typeface;
             paint.TextSize = font.Size;
@@ -50,11 +54,11 @@ namespace WatermarkService.Models
             var halfWidth = 0.5f * areaWidth;
             var halfHeight = 0.5f * areaHeight;
 
-            SKMatrix matrix = currentMatrix;
+            var matrix = currentMatrix;
 
-            SKMatrix translate1 = SKMatrix.CreateTranslation(halfWidth, halfHeight);
-            SKMatrix rotate = SKMatrix.CreateRotation(rotationAngle);
-            SKMatrix translate2 = SKMatrix.CreateTranslation(-halfWidth, -halfHeight);
+            var translate1 = SKMatrix.CreateTranslation(halfWidth, halfHeight);
+            var rotate = SKMatrix.CreateRotation(rotationAngle);
+            var translate2 = SKMatrix.CreateTranslation(-halfWidth, -halfHeight);
 
             SKMatrix.Concat(ref matrix, ref matrix, ref translate1);
             SKMatrix.Concat(ref matrix, ref matrix, ref rotate);
@@ -65,11 +69,11 @@ namespace WatermarkService.Models
         
         internal static void DrawText(SKCanvas canvas, string text, float x, float y, SKPaint paint)
         {
-            IEnumerable<string> lines = text.Split(lineSeparators, StringSplitOptions.None);
-            y -= paint.FontMetrics.Ascent;
-            float lineHeight = paint.FontMetrics.Descent - paint.FontMetrics.Ascent;
+            var lines = text.Split(lineSeparators, StringSplitOptions.None);
+            var lineHeight = paint.FontMetrics.Descent - paint.FontMetrics.Ascent;
 
-            foreach (string line in lines)
+            y -= paint.FontMetrics.Ascent;
+            foreach (var line in lines)
             {
                 canvas.DrawText(line, x, y, paint);
                 y += lineHeight;
@@ -78,6 +82,7 @@ namespace WatermarkService.Models
 
         internal static SKFont GetOptimalFont(string text, Font font, float rotationAngle, float maxWidth, float maxHeight)
         {
+            const int sizeStep = 16;
             const double guardIntervalRatio = 0.95;
 
             var width = maxWidth * guardIntervalRatio;
@@ -86,43 +91,70 @@ namespace WatermarkService.Models
             var weight = font.IsBold ? SKFontStyleWeight.Bold : SKFontStyleWeight.Normal;
             var slant = font.IsItalic ? SKFontStyleSlant.Oblique : SKFontStyleSlant.Upright;
 
-            SKTypeface typeface = SKTypeface.FromFamilyName(
+            using var typeface = SKTypeface.FromFamilyName(
                 font.FontFamily,
                 weight,
                 SKFontStyleWidth.Normal,
                 slant
                 );
-
-            int optimalSize = 1;
-
-            while (true)
+            
+            bool IsValidSize(int currentSize)
             {
-                int currentSize = optimalSize + 1;
-                SKFont currentFont = new SKFont(typeface, currentSize);
+                using var currentFont = new SKFont(typeface, currentSize);
 
-                SKSize size = GetTextSize(text, currentFont);
+                var size = GetTextSize(text, currentFont);
 
-                SKPoint[] points = new[] {
+                var points = new[] {
                     new SKPoint(0, 0),
                     new SKPoint(size.Width, 0),
                     new SKPoint(size.Width, size.Height),
                     new SKPoint(0, size.Height)
                 };
 
-                SKPoint[] transformedPoints =
+                var transformedPoints =
                     CreateWorldMatrixWithRotation(SKMatrix.Identity, rotationAngle, maxWidth, maxHeight).
                     MapPoints(points);
 
-                double transformedWidth = transformedPoints.Max(p => p.X) - transformedPoints.Min(p => p.X);
-                double transformedHeight = transformedPoints.Max(p => p.Y) - transformedPoints.Min(p => p.Y);
+                var transformedWidth = transformedPoints.Max(p => p.X) - transformedPoints.Min(p => p.X);
+                var transformedHeight = transformedPoints.Max(p => p.Y) - transformedPoints.Min(p => p.Y);
 
-                if (width < transformedWidth || height < transformedHeight)
+                return width >= transformedWidth && height >= transformedHeight;
+            }
+
+            int size = 0, minSize = 0, maxSize = 0;
+
+            while (true)
+            {
+                minSize = size;
+                size += sizeStep;
+
+                if (!IsValidSize(size))
+                {
+                    maxSize = size;
+                    break;
+                }
+            }
+
+            int averageSize = 0, optimalSize = minSize;
+
+            while (true)
+            {
+                averageSize = (minSize + maxSize) / 2;
+
+                if (averageSize == minSize || averageSize == maxSize)
                 {
                     break;
                 }
 
-                currentFont.Dispose();
-                optimalSize = currentSize;
+                if (IsValidSize(averageSize))
+                {
+                    minSize = averageSize;
+                    optimalSize = averageSize;
+                }
+                else
+                {
+                    maxSize = averageSize;
+                }
             }
 
             return new SKFont(typeface, optimalSize);
@@ -130,28 +162,23 @@ namespace WatermarkService.Models
 
         internal static SKSize GetTextSize(string text, SKFont font)
         {
-            string[] lines = text.Split(lineSeparators, StringSplitOptions.None);
-
-            SKRect bounds = new SKRect();
-            SKFontMetrics fontMetrics = default(SKFontMetrics);
+            var lines = text.Split(lineSeparators, StringSplitOptions.None);
+            var length = lines.Length;
+            var bounds = new SKRect();
             float maxTextWidth = 0;
             int count = 0;
 
-            using (var paint = new SKPaint(font))
+            using var paint = new SKPaint(font);
+            var fontMetrics = paint.FontMetrics;
+
+            for (int i = 0; i < length; i++)
             {
-                int length = lines.Length;
-
-                for (int i = 0; i < length; i++)
+                var lineTextWidth = paint.MeasureText(lines[i], ref bounds);
+                if (maxTextWidth < lineTextWidth)
                 {
-                    float lineTextWidth = paint.MeasureText(lines[i], ref bounds);
-                    if (maxTextWidth < lineTextWidth)
-                    {
-                        maxTextWidth = lineTextWidth;
-                    }
-                    count++;
+                    maxTextWidth = lineTextWidth;
                 }
-
-                fontMetrics = paint.FontMetrics;
+                count++;
             }
 
             return new SKSize(maxTextWidth, count * (fontMetrics.Descent - fontMetrics.Ascent));

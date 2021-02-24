@@ -62,7 +62,7 @@
 
                                 <div class="mb-2">
                                     <label class="float-left">Alpha:</label>
-                                    <input id="alphaId" type="number" class="form-control" min="0" max="255" value="200">
+                                    <input id="alphaId" type="number" class="form-control" min="0" max="255" value="150">
                                 </div>
 
                                 <div class="mb-2">
@@ -276,9 +276,20 @@
             }
             else
             {
+                if (responseData.hasOwnProperty('errors')) {
+                    responseData = responseData.errors;
+                }
+
+                let html = "Errors:";
+
+                for (var item in responseData) {
+                    html = html + `<div>[${item}] ${responseData[item]}</div>`;
+                }
+
+                errorPanel.innerHTML = html;
+
                 errorPanel.hidden = false;
                 imagePanel.hidden = true;
-                errorPanel.innerHTML = Object.values(responseData).reduce((html, item) => html + `<div>${item}</div>`, 'Errors:');
             }
 
             resultPanel.hidden = false;

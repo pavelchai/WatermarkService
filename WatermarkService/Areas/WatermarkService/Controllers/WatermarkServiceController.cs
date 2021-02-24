@@ -3,10 +3,12 @@
  * Licensed under MIT License.
  * Copyright © 2021 Pavel Chaimardanov.
  */
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
-using WatermarkService.Models;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using WatermarkService.Models;
 
 namespace WatermarkService.Controllers
 {
@@ -31,9 +33,9 @@ namespace WatermarkService.Controllers
         /// <param name="request"> Request info. </param>
         /// <returns> Response info. </returns>
         [HttpPost]
-        [ProducesResponseType(typeof(WatermarkServiceResponse), 200)]
-        [ProducesResponseType(400)]
-        public IActionResult Post(WatermarkServiceRequest request)
+        [ProducesResponseType(typeof(WatermarkServiceResponse), (int)HttpStatusCode.OK)]
+        [ProducesResponseType(typeof(void), (int)HttpStatusCode.BadRequest)]
+        public async Task<IActionResult> Post(WatermarkServiceRequest request)
         {
             if (!ModelState.IsValid)
             {
@@ -47,7 +49,8 @@ namespace WatermarkService.Controllers
                 return BadRequest(ModelState);
             }
 
-            return new ObjectResult(WatermarkServiceProcessor.Process(request));
+            var response = await Task.Run(() => WatermarkServiceProcessor.Process(request));
+            return new ObjectResult(response);
         }
     }
 }

@@ -35,7 +35,7 @@ namespace WatermarkService.Models
 
         private static bool TryAddWatermark(Watermark watermark, Image input, out Image output)
         {
-            string[] parts = input.DataBase64.Split(',');
+            var parts = input.DataBase64.Split(',');
             if (parts.Length != 2)
             {
                 output = null;
@@ -74,21 +74,26 @@ namespace WatermarkService.Models
                 }
             }
 
-            int width = inputBitmap.Width;
-            int height = inputBitmap.Height;
+            var width = inputBitmap.Width;
+            var height = inputBitmap.Height;
 
-            int watermarkWidth = width / watermark.RepeatCountX;
-            int watermarkHeight = height / watermark.RepeatCountY;
+            var watermarkWidth = width / watermark.RepeatCountX;
+            var watermarkHeight = height / watermark.RepeatCountY;
 
             using var outputBitmap = new SKBitmap(width, height, SKColorType.Bgra8888, SKAlphaType.Premul);
-            using var canvas = new SKCanvas(outputBitmap);
 
-            using (var paint = SkiaSharpUtils.CreatePaint())
+            using (var canvas = new SKCanvas(outputBitmap))
             {
-                canvas.DrawBitmap(inputBitmap, 0, 0);
+                using (var paint = SkiaSharpUtils.CreatePaint())
+                {
+                    canvas.DrawBitmap(inputBitmap, 0, 0);
 
-                paint.Shader = CreateShader(watermark, watermarkWidth, watermarkHeight);
-                canvas.DrawRect(0, 0, (float)width, (float)height, paint);
+                    using (var shader = CreateShader(watermark, watermarkWidth, watermarkHeight))
+                    {
+                        paint.Shader = CreateShader(watermark, watermarkWidth, watermarkHeight);
+                        canvas.DrawRect(0, 0, (float)width, (float)height, paint);
+                    }
+                }
             }
 
             output = new Image()
@@ -103,36 +108,33 @@ namespace WatermarkService.Models
 
         private static SKShader CreateShader(Watermark watermark, int watermarkWidth, int watermarkHeight)
         {
-            using (var watermarkBitmap = new SKBitmap(watermarkWidth, watermarkHeight))
-            {
-                using (var canvas = new SKCanvas(watermarkBitmap))
-                {
-                    var text = watermark.Text;
-                    var rotationAngle = (float)watermark.RotationAngle;
-                    var font = SkiaSharpUtils.GetOptimalFont(watermark.Text, watermark.Font, rotationAngle, watermarkWidth, watermarkHeight);
+            using var watermarkBitmap = new SKBitmap(watermarkWidth, watermarkHeight);
+            using var canvas = new SKCanvas(watermarkBitmap);
 
-                    using (var paint = SkiaSharpUtils.CreatePaint(font))
-                    {
-                        var size = SkiaSharpUtils.GetTextSize(text, font);
-                        var x = 0.5f * (watermarkWidth -  size.Width);
-                        var y = 0.5f * (watermarkHeight - size.Height);
-                        var matrix = SkiaSharpUtils.CreateWorldMatrixWithRotation(canvas.TotalMatrix, rotationAngle, watermarkWidth, watermarkHeight);
+            var text = watermark.Text;
+            var rotationAngle = (float)watermark.RotationAngle;
 
-                        canvas.SetMatrix(matrix);
+            using var font = SkiaSharpUtils.GetOptimalFont(watermark.Text, watermark.Font, rotationAngle, watermarkWidth, watermarkHeight);
 
-                        SkiaSharpUtils.SetColor(paint, watermark.BackgroundColor);
-                        canvas.DrawRect(x, y, size.Width, size.Height, paint);
+            var size = SkiaSharpUtils.GetTextSize(text, font);
+            var x = 0.5f * (watermarkWidth - size.Width);
+            var y = 0.5f * (watermarkHeight - size.Height);
+            var matrix = SkiaSharpUtils.CreateWorldMatrixWithRotation(canvas.TotalMatrix, rotationAngle, watermarkWidth, watermarkHeight);
 
-                        SkiaSharpUtils.SetColor(paint, watermark.ForegroundColor);
-                        SkiaSharpUtils.DrawText(canvas, text, x, y, paint);
+            canvas.SetMatrix(matrix);
 
-                        return SKShader.CreateBitmap(
-                            watermarkBitmap,
-                            SKShaderTileMode.Repeat,
-                            SKShaderTileMode.Repeat);
-                    }
-                }
-            }
+            using var paint = SkiaSharpUtils.CreatePaint(font);
+
+            SkiaSharpUtils.SetColor(paint, watermark.BackgroundColor);
+            canvas.DrawRect(x, y, size.Width, size.Height, paint);
+
+            SkiaSharpUtils.SetColor(paint, watermark.ForegroundColor);
+            SkiaSharpUtils.DrawText(canvas, text, x, y, paint);
+
+            return SKShader.CreateBitmap(
+                watermarkBitmap,
+                SKShaderTileMode.Repeat,
+                SKShaderTileMode.Repeat);
         }
     }
 }
