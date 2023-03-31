@@ -6,9 +6,7 @@ Target: .Net 5
 
 # How to use
 
-Online demo: https://altphotonic.ru/WatermarkService/
-
-Swagger UI: https://altphotonic.ru/swagger/index.html?urls.primaryName=WatermarkService
+Swagger UI: /swagger/index.html?urls.primaryName=WatermarkService
 
 1) Open link in browser
 2) Select your image
